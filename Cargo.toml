@@ -5,3 +5,8 @@ authors = ["Jack Mordaunt <jackmordaunt@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+image = "0.20.1"
+byteorder = "1.2.7"
+
+[dev-dependencies]
+clap = "2.32.0"

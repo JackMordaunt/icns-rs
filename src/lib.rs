@@ -1,2 +1,4 @@
+//! This crate provides encoding for ICNS icons (Apple Icon Image Format). 
+
 pub mod encode;
-pub mod os_type;
+mod os_type;

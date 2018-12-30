@@ -3,6 +3,7 @@ use std::io::{self, Write};
 use byteorder::{BigEndian, WriteBytesExt};
 use image::{self, DynamicImage, RgbaImage, GenericImageView, png::PNGEncoder};
 use image::imageops::{resize, Lanczos3};
+use rayon::{self, prelude::*};
 
 use crate::os_type::OSType;
 
@@ -34,19 +35,15 @@ impl IconSet {
     /// Create an IconSet from the provided image. 
     /// If width != height, the image will be resized using the largest side 
     /// without preserving the aspect ratio.
-    /// TODO: - Reject images smaller than 16x16 pixels.
-    ///       - Parallelise the resizing via rayon. 
     fn from(img: &DynamicImage) -> Self {
-        let mut icons: Vec<Icon> = vec![];
         let kind = OSType::nearest(max(img.width(), img.height()));
-        for variant in kind.smaller_variants() {
-            let buffer = resize(img, variant.size(), variant.size(), Lanczos3);
-            let icon = Icon{
-                kind: variant,
-                image: buffer,
-            };
-            icons.push(icon);
-        }
+        let icons: Vec<Icon> = kind.smaller_variants()
+            .par_iter()
+            .map(|v| Icon {
+                kind: v.clone(),
+                image: resize(img, v.size(), v.size(), Lanczos3),
+            })
+            .collect();
         IconSet { icons }
     }
     /// Write the encoded iconset to writer ```w```. 

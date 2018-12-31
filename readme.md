@@ -80,3 +80,7 @@ fn main() {
     - [ ] Flag based use  
     - [ ] Shell pipe use   
 - [ ] Unit tests  
+
+## Feedback Wanted  
+
+I'm relatively new to Rust. If you have any tips, see any non-idiomatic code, or notice ways to make the library more ergonomic and powerful: I'd love to hear from you. 

@@ -15,10 +15,12 @@ fn main() {
         .arg(Arg::with_name("input")
             .short("i")
             .takes_value(true)
+            .requires("output")
             .help("path to input file"))
         .arg(Arg::with_name("output")
             .short("o")
             .takes_value(true)
+            .requires("input")
             .help("path to output file"))
         .get_matches();
     if let (Some(input), Some(output)) = (matches.value_of("input"), matches.value_of("output")) {

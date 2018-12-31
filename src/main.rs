@@ -12,18 +12,20 @@ fn main() {
         .version("0.1.0")
         .author("Jack Mordaunt <jackmordaunt@gmail.com>")
         .about("easily create icns icons from png images")
-        .arg(Arg::with_name("input")
+        .arg(Arg::with_name("in")
             .short("i")
+            .long("input")
             .takes_value(true)
-            .requires("output")
+            .requires("out")
             .help("path to input file"))
-        .arg(Arg::with_name("output")
+        .arg(Arg::with_name("out")
             .short("o")
+            .long("output")
             .takes_value(true)
-            .requires("input")
+            .requires("in")
             .help("path to output file"))
         .get_matches();
-    if let (Some(src), Some(out)) = (cli.value_of("input"), cli.value_of("output")) {
+    if let (Some(src), Some(out)) = (cli.value_of("in"), cli.value_of("out")) {
         let src = image::open(&src)
             .expect("decoding input image");
         let out = BufWriter::new(File::create(&out)

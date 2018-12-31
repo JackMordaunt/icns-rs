@@ -1,7 +1,7 @@
 use clap::{App, Arg};
 use std::io::prelude::*;
 use std::fs;
-use image;
+use image::{self};
 use icns::encode::Encoder;
 
 fn main() {
@@ -32,6 +32,6 @@ fn main() {
     let mut output = fs::File::create(&output)
         .expect("creating output file");
     Encoder::new(&mut output)
-        .encode(&png)
+        .encode(&png.to_rgba())
         .expect("encoding icns");
 }

@@ -1,7 +1,7 @@
 use std::cmp::max;
 use std::io::{self, Write};
 use byteorder::{BigEndian, WriteBytesExt};
-use image::{self, DynamicImage, RgbaImage, GenericImageView, png::PNGEncoder};
+use image::{self, RgbaImage, png::PNGEncoder};
 use image::imageops::{resize, Lanczos3};
 use rayon::{self, prelude::*};
 
@@ -18,7 +18,7 @@ impl<W: Write> Encoder<W> {
         Encoder{w}
     }
     // Encode the icns from a source png encoded buffer.  
-    pub fn encode(&mut self, img: &DynamicImage) -> io::Result<()> {
+    pub fn encode(&mut self, img: &RgbaImage) -> io::Result<()> {
         IconSet::from(img).write_to(self.w.by_ref())
     }
 }
@@ -35,7 +35,7 @@ impl IconSet {
     /// Create an IconSet from the provided image. 
     /// If width != height, the image will be resized using the largest side 
     /// without preserving the aspect ratio.
-    fn from(img: &DynamicImage) -> Self {
+    fn from(img: &RgbaImage) -> Self {
         let kind = OSType::nearest(max(img.width(), img.height()));
         let icons: Vec<Icon> = kind.smaller_variants()
             .par_iter()

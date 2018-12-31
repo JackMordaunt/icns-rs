@@ -5,21 +5,14 @@ use icns::encode::Encoder;
 use image::{self, ConvertBuffer};
 
 fn main() {
-    let imgx = 800;
-    let imgy = 800;
+    let imgx = 1024;
+    let imgy = 1024;
 
     let scalex = 3.0 / imgx as f32;
     let scaley = 3.0 / imgy as f32;
 
     // Create a new ImgBuf with width: imgx and height: imgy.
     let mut imgbuf = image::ImageBuffer::new(imgx, imgy);
-
-    // Generate gradient. 
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        let r = (0.3 * x as f32) as u8;
-        let b = (0.3 * y as f32) as u8;
-        *pixel = image::Rgb([r, 0, b]);
-    }
 
     // Generate fractal. 
     for x in 0..imgx {

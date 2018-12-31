@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::BufWriter;
 use num_complex;
-use icns::encode::Encoder;
+use icns::Encoder;
 use image::{self, ConvertBuffer};
 
 fn main() {

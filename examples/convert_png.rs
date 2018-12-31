@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{prelude::*, BufReader, BufWriter};
 use clap::{App, Arg};
 use image;
-use icns::encode::Encoder;
+use icns::Encoder;
 
 fn main() {
     let matches = App::new("convert png to icns")

@@ -11,3 +11,4 @@ rayon = "1.0.3"
 
 [dev-dependencies]
 clap = "2.32.0"
+num-complex = "0.2"

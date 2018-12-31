@@ -1,7 +1,7 @@
+use std::fs::File;
+use std::io::{prelude::*, BufReader, BufWriter};
 use clap::{App, Arg};
-use std::io::prelude::*;
-use std::fs;
-use image::{self};
+use image;
 use icns::encode::Encoder;
 
 fn main() {
@@ -20,17 +20,28 @@ fn main() {
             .short("o")
             .help("path to output icns image"))
         .get_matches();
+
+    // Load inputs. Since we specified "required", these unwraps wont fail. 
     let input = matches.value_of("input").unwrap();
     let output = matches.value_of("output").unwrap();
+
+    // Read the png file into a buffer.
     let mut png: Vec<u8> = vec![];
-    fs::File::open(&input)
-        .expect("opening input file")
+    BufReader::new(File::open(&input)
+        .expect("opening input file"))
         .read_to_end(&mut png)
         .expect("buffering input file");
+    
+    // Load a DynamicImage object from the raw png data. 
     let png = image::load_from_memory(&png)
         .expect("decoding png from buffer");
-    let mut output = fs::File::create(&output)
-        .expect("creating output file");
+    
+    // Create the output file. 
+    let mut output = BufWriter::new(File::create(&output)
+        .expect("creating output file"));
+
+    // Encode the png as icns into the output file. 
+    // Note we use to_rgba to convert the DynamicImage into an RgbaImage. 
     Encoder::new(&mut output)
         .encode(&png.to_rgba())
         .expect("encoding icns");

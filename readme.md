@@ -12,7 +12,7 @@ The most common ways to generate icns files are:
 
 This is a Rust port of my Go project [icns](https://github.com/jackmordaunt/icns).
 
-Where the Go project builds on the standard library `image.Image` interface, this library builds on the `DyanmicImage` trait from [Piston](https://github.com/pistondevelopers) developer's [image](https://github.com/pistondevelopers/image) crate. 
+Where the Go project builds on the standard library `image.Image` interface, this library builds on the image abstractions from [Piston](https://github.com/pistondevelopers) developer's [image](https://github.com/pistondevelopers/image) crate. 
 
 ## Usage  
 
@@ -72,7 +72,7 @@ fn main() {
 ```
 
 ## Features  
-- [x] Encode icns (mvp) `DynamicImage -> .icns`
+- [x] Encode icns (mvp) `RgbaImage -> .icns`
     - [x] Parallel resizing (thanks [rayon](https://github.com/rayon-rs/rayon))  
     - [x] Lanczos3 interpolation  
 - [ ] Decode largest image from icns into standalone png  

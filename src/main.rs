@@ -1,7 +1,7 @@
 mod encode;
 mod os_type;
 
-use std::io::BufWriter;
+use std::io::{self, BufReader, BufWriter};
 use std::fs::File;
 use clap::{App, Arg};
 use image;
@@ -29,6 +29,17 @@ fn main() {
         let out = BufWriter::new(File::create(&out)
             .expect("creating output file"));
         Encoder::new(out).encode(&src.to_rgba())
+            .expect("encoding icns");
+    } else {
+        let mut buf: Vec<u8> = vec![];
+        let stdin = io::stdin();
+        let mut stdin = BufReader::new(stdin.lock());
+        io::copy(&mut stdin, &mut buf)
+            .expect("reading from stdin");
+        let src = image::load_from_memory(&buf)
+            .expect("decoding input image");
+        Encoder::new(BufWriter::new(io::stdout().lock()))
+            .encode(&src.to_rgba())
             .expect("encoding icns");
     }
 }

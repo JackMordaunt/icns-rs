@@ -1,9 +1,11 @@
 use std::cmp::max;
 use std::io::{self, Write};
 use byteorder::{BigEndian, WriteBytesExt};
-use image::{self, RgbaImage, png::PNGEncoder};
+use image::{self, RgbaImage};
 use image::imageops::{resize, Lanczos3};
 use rayon::{self, prelude::*};
+use png::{self, HasParameters};
+use deflate;
 
 use crate::os_type::OSType;
 
@@ -75,12 +77,17 @@ struct Icon {
 impl Icon {
     /// Write the encoded icon to writer ```w```.
     fn write_to(self, mut wr: impl Write) -> io::Result<()> {
-        let w = self.image.width();
-        let h = self.image.height();
-        let mut png_data: Vec<u8> = vec![];
         // Pre-buffer the png image so we can calculate size total. 
-        PNGEncoder::new(&mut png_data)
-            .encode(self.image.into_raw().as_ref(), w, h, image::RGBA(8))?;
+        let (width, height) = (self.image.width(), self.image.height());
+        let mut buffer: Vec<u8> = vec![];
+        PNGEncoder::new(&mut buffer)
+            .encode(
+                self.image.into_raw().as_ref(),
+                width,
+                height,
+                png::ColorType::RGBA,
+                png::BitDepth::Eight,
+            )?;
         // Write the 4-byte OSType identifier.
         // Coerce array of characters into slice of bytes through a vec deref.
         wr.write_all(&self.kind.header()
@@ -88,9 +95,36 @@ impl Icon {
             .map(|c| *c as u8)
             .collect::<Vec<u8>>())?;
         // Write the 4-byte icon size in bytes (data.len + header.len).
-        wr.write_u32::<BigEndian>((png_data.len() + 8) as u32)?;
+        wr.write_u32::<BigEndian>((buffer.len() + 8) as u32)?;
         // Write the image data. 
-        wr.write_all(&png_data)?;
+        wr.write_all(&buffer)?;
         Ok(())
+    }
+}
+
+/// PNGEncoder is a convenience wrapper around ```png::Encoder```.
+struct PNGEncoder<W: Write> {
+    w: W,
+}
+
+impl<W: Write> PNGEncoder<W> {
+    fn new(w: W) -> Self {
+        PNGEncoder { w }
+    }
+    fn encode(
+        self,
+        data: &[u8],
+        width: u32,
+        height: u32,
+        ct: png::ColorType,
+        bits: png::BitDepth,
+    ) -> io::Result<()> {
+        let mut encoder = png::Encoder::new(self.w, width, height);
+        encoder
+            .set(ct)
+            .set(bits)
+            .set(deflate::CompressionOptions::huffman_only());
+        let mut writer = encoder.write_header()?;
+        writer.write_image_data(data).map_err(|e| e.into())
     }
 }

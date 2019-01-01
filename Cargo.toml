@@ -1,6 +1,6 @@
 [package]
 name = "icns"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jack Mordaunt <jackmordaunt@gmail.com>"]
 edition = "2018"
 
@@ -17,6 +17,11 @@ image = "0.20.1"
 byteorder = "1.2.7"
 rayon = "1.0.3"
 clap = "2.32.0"
+deflate = "0.7.2"
+
+[dependencies.png]
+git = "https://github.com/JackMordaunt/image-png.git"
+branch = "deflate/specify-compression"
 
 [dev-dependencies]
 clap = "2.32.0"

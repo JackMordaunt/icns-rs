@@ -76,9 +76,9 @@ fn main() {
     - [x] Parallel resizing (thanks [rayon](https://github.com/rayon-rs/rayon))  
     - [x] Lanczos3 interpolation  
 - [ ] Decode largest image from icns into standalone png  
-- [ ] Simple and robust cli app
-    - [ ] Flag based use  
-    - [ ] Shell pipe use   
+- [x] Simple and robust cli app
+    - [x] Flag based use  
+    - [x] Shell pipe use   
 - [ ] Unit tests  
 
 ## Feedback Wanted  

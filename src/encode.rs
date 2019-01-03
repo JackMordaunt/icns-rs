@@ -123,7 +123,7 @@ impl<W: Write> PNGEncoder<W> {
         encoder
             .set(ct)
             .set(bits)
-            .set(deflate::CompressionOptions::huffman_only());
+            .set(png::Compression::Default);
         let mut writer = encoder.write_header()?;
         writer.write_image_data(data).map_err(|e| e.into())
     }

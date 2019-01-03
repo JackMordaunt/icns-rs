@@ -23,6 +23,9 @@ deflate = "0.7.2"
 git = "https://github.com/JackMordaunt/image-png.git"
 branch = "deflate/specify-compression"
 
+# [dependencies.png]
+# path = "../../forks/image-png"
+
 [dev-dependencies]
 clap = "2.32.0"
 num-complex = "0.2"

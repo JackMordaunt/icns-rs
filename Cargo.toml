@@ -13,11 +13,11 @@ name = "icnsify"
 path = "src/main.rs"
 
 [dependencies]
-image = "0.20.1"
-byteorder = "1.2.7"
-rayon = "1.0.3"
-clap = "2.32.0"
-deflate = "0.7.2"
+image = "0.22.1"
+byteorder = "1.3.2"
+rayon = "1.1.0"
+clap = "2.33.0"
+deflate = "0.7.20"
 
 [dependencies.png]
 git = "https://github.com/JackMordaunt/image-png.git"
@@ -27,5 +27,5 @@ branch = "deflate/specify-compression"
 # path = "../../forks/image-png"
 
 [dev-dependencies]
-clap = "2.32.0"
-num-complex = "0.2"
+clap = "2.33.0"
+num-complex = "0.2.3"

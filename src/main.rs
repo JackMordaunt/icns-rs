@@ -5,7 +5,7 @@ use std::io::{self, BufReader, BufWriter};
 use std::fs::File;
 use clap::{App, Arg};
 use image;
-use icns::Encoder;
+use encode::Encoder;
 
 fn main() {
     let cli = App::new("icnsify")

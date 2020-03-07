@@ -30,7 +30,7 @@ struct IconSet {
 }
 
 /// Magic bytes that denote an icns file. These bytes appear at index 0.
-const ICONSET_MAGIC: [char; 4] = ['i', 'c', 'n', 's'];
+const ICONSET_MAGIC: &'static str = "icns";
 
 impl IconSet {
     /// Write the encoded iconset to writer `w`.
@@ -41,12 +41,7 @@ impl IconSet {
             icon.write_to(&mut buffer)?;
         }
         // Write the 4-byte magic bytes to identify this as an icns image.
-        wr.write_all(
-            &ICONSET_MAGIC
-                .iter()
-                .map(|c| *c as u8)
-                .collect::<Vec<u8>>(),
-        )?;
+        wr.write_all(ICONSET_MAGIC.as_bytes())?;
         // Write the 4-byte container size in bytes.
         wr.write_u32::<BigEndian>((buffer.len() + 8) as u32)?;
         // Write the encoded icons.
@@ -76,14 +71,7 @@ impl Icon {
         )?;
         // Write the 4-byte OSType identifier.
         // Coerce array of characters into slice of bytes through a vec deref.
-        wr.write_all(
-            &self
-                .kind
-                .header()
-                .iter()
-                .map(|c| *c as u8)
-                .collect::<Vec<u8>>(),
-        )?;
+        wr.write_all(&self.kind.header().as_bytes())?;
         // Write the 4-byte icon size in bytes (data.len + header.len).
         wr.write_u32::<BigEndian>((buffer.len() + 8) as u32)?;
         // Write the image data.

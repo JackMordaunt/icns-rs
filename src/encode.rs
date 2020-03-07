@@ -43,7 +43,7 @@ impl IconSet {
         // Write the 4-byte magic bytes to identify this as an icns image.
         wr.write_all(
             &ICONSET_MAGIC
-                .into_iter()
+                .iter()
                 .map(|c| *c as u8)
                 .collect::<Vec<u8>>(),
         )?;
@@ -80,7 +80,7 @@ impl Icon {
             &self
                 .kind
                 .header()
-                .into_iter()
+                .iter()
                 .map(|c| *c as u8)
                 .collect::<Vec<u8>>(),
         )?;

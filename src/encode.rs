@@ -14,7 +14,7 @@ pub struct Encoder<W: Write> {
 }
 
 impl<W: Write> Encoder<W> {
-    /// Create a new encoder that writes to ```w```.
+    /// Create a new encoder that writes to `w`.
     pub fn new(w: W) -> Self {
         Encoder { w }
     }
@@ -48,7 +48,7 @@ impl IconSet {
             .collect();
         IconSet { icons }
     }
-    /// Write the encoded iconset to writer ```w```.
+    /// Write the encoded iconset to writer `w`.
     fn write_to(self, mut wr: impl Write) -> io::Result<()> {
         // Pre-buffer the encoded icons so we can calculate the final size.
         let mut buffer: Vec<u8> = vec![];
@@ -77,7 +77,7 @@ struct Icon {
 }
 
 impl Icon {
-    /// Write the encoded icon to writer ```w```.
+    /// Write the encoded icon to writer `w`.
     fn write_to(self, mut wr: impl Write) -> io::Result<()> {
         // Pre-buffer the png image so we can calculate size total.
         let (width, height) = (self.image.width(), self.image.height());
@@ -107,7 +107,7 @@ impl Icon {
     }
 }
 
-/// PNGEncoder is a convenience wrapper around ```png::Encoder```.
+/// PNGEncoder is a convenience wrapper around `png::Encoder`.
 struct PNGEncoder<W: Write> {
     w: W,
 }

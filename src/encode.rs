@@ -126,10 +126,13 @@ impl From<&RgbaImage> for IconSet {
         let kind = OSType::nearest(max(img.width(), img.height()));
         let icons: Vec<Icon> = kind
             .smaller_variants()
-            .par_iter()
-            .map(|v| Icon {
-                kind: v.clone(),
-                image: resize(img, v.size(), v.size(), Lanczos3),
+            .into_par_iter()
+            .map(|v| {
+                let size = v.size();
+                Icon {
+                    kind: v,
+                    image: resize(img, size, size, Lanczos3),
+                }
             })
             .collect();
         IconSet { icons }

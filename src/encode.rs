@@ -33,21 +33,6 @@ struct IconSet {
 const ICONSET_MAGIC: [char; 4] = ['i', 'c', 'n', 's'];
 
 impl IconSet {
-    /// Create an IconSet from the provided image.
-    /// If width != height, the image will be resized using the largest side
-    /// without preserving the aspect ratio.
-    fn from(img: &RgbaImage) -> Self {
-        let kind = OSType::nearest(max(img.width(), img.height()));
-        let icons: Vec<Icon> = kind
-            .smaller_variants()
-            .par_iter()
-            .map(|v| Icon {
-                kind: v.clone(),
-                image: resize(img, v.size(), v.size(), Lanczos3),
-            })
-            .collect();
-        IconSet { icons }
-    }
     /// Write the encoded iconset to writer `w`.
     fn write_to(self, mut wr: impl Write) -> io::Result<()> {
         // Pre-buffer the encoded icons so we can calculate the final size.
@@ -130,5 +115,23 @@ impl<W: Write> PNGEncoder<W> {
         encoder.set_compression(png::Compression::Default);
         let mut writer = encoder.write_header()?;
         writer.write_image_data(data).map_err(|e| e.into())
+    }
+}
+
+/// Create an IconSet from the provided image.
+/// If width != height, the image will be resized using the largest side
+/// without preserving the aspect ratio.
+impl From<&RgbaImage> for IconSet {
+    fn from(img: &RgbaImage) -> Self {
+        let kind = OSType::nearest(max(img.width(), img.height()));
+        let icons: Vec<Icon> = kind
+            .smaller_variants()
+            .par_iter()
+            .map(|v| Icon {
+                kind: v.clone(),
+                image: resize(img, v.size(), v.size(), Lanczos3),
+            })
+            .collect();
+        IconSet { icons }
     }
 }

@@ -70,7 +70,6 @@ impl Icon {
             png::BitDepth::Eight,
         )?;
         // Write the 4-byte OSType identifier.
-        // Coerce array of characters into slice of bytes through a vec deref.
         wr.write_all(&self.kind.header().as_bytes())?;
         // Write the 4-byte icon size in bytes (data.len + header.len).
         wr.write_u32::<BigEndian>((buffer.len() + 8) as u32)?;

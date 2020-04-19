@@ -1,8 +1,8 @@
+use icns::Encoder;
+use image::buffer::ConvertBuffer;
+use num_complex;
 use std::fs::File;
 use std::io::BufWriter;
-use num_complex;
-use icns::Encoder;
-use image::{self, ConvertBuffer};
 
 fn main() {
     let imgx = 1024;
@@ -14,7 +14,7 @@ fn main() {
     // Create a new ImgBuf with width: imgx and height: imgy.
     let mut imgbuf = image::ImageBuffer::new(imgx, imgy);
 
-    // Generate fractal. 
+    // Generate fractal.
     for x in 0..imgx {
         for y in 0..imgy {
             let cx = y as f32 * scalex - 1.5;
@@ -36,11 +36,10 @@ fn main() {
     }
 
     // Open output file.
-    let mut output = BufWriter::new(File::create("fractal.icns")
-        .expect("creating output file"));
-     
-    // Encode the image as icns. 
-    // Note that we use ConvertBuffer trait to convert from RGB to RGBA. 
+    let mut output = BufWriter::new(File::create("fractal.icns").expect("creating output file"));
+
+    // Encode the image as icns.
+    // Note that we use ConvertBuffer trait to convert from RGB to RGBA.
     Encoder::new(&mut output)
         .encode(&imgbuf.convert())
         .expect("encoding icns");

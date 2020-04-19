@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 /// OSType is an enum of various icon types that can exist inside an icns
 /// container. This enum only contains the high resolution variants that we care
 /// about. Find the full list here: https://en.wikipedia.org/wiki/Apple_Icon_Image_format
@@ -63,5 +65,20 @@ impl OSType {
             }
         }
         variants
+    }
+}
+
+impl FromStr for OSType {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "ic10" => Ok(OSType::IC10),
+            "ic14" => Ok(OSType::IC14),
+            "ic13" => Ok(OSType::IC13),
+            "ic07" => Ok(OSType::IC07),
+            "ic12" => Ok(OSType::IC12),
+            "ic11" => Ok(OSType::IC11),
+            _ => Err(format!("{} is not an icns OSType", s)),
+        }
     }
 }

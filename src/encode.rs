@@ -1,10 +1,9 @@
 use byteorder::{BigEndian, WriteBytesExt};
 use image::imageops::{resize, Lanczos3};
-use image::{self, RgbaImage};
-use png;
+use image::{self, DynamicImage, GenericImageView, RgbaImage};
 use rayon::{self, prelude::*};
 use std::cmp::max;
-use std::io::{self, Write};
+use std::io::Write;
 
 use crate::os_type::OSType;
 
@@ -18,14 +17,19 @@ impl<W: Write> Encoder<W> {
     pub fn new(w: W) -> Self {
         Encoder { w }
     }
-    // Encode the icns from a source png encoded buffer.
-    pub fn encode(&mut self, img: &RgbaImage) -> io::Result<()> {
-        IconSet::from(img).write_to(self.w.by_ref())
+    /// Encode encode an icns into the writer, using the source image.
+    pub fn encode<Img>(&mut self, img: Img) -> Result<(), Box<dyn std::error::Error>>
+    where
+        Img: Into<IconSet>,
+    {
+        // Note(jfm): CPU intensive work is being done in `From` trait.
+        // This is probably not good practice since it hides the actual work.
+        img.into().write_to(self.w.by_ref())
     }
 }
 
 /// IconSet encodes a vector of icons.
-struct IconSet {
+pub struct IconSet {
     icons: Vec<Icon>,
 }
 
@@ -34,7 +38,7 @@ const ICONSET_MAGIC: &'static str = "icns";
 
 impl IconSet {
     /// Write the encoded iconset to writer `w`.
-    fn write_to(self, mut wr: impl Write) -> io::Result<()> {
+    pub fn write_to(self, mut wr: impl Write) -> Result<(), Box<dyn std::error::Error>> {
         // Pre-buffer the encoded icons so we can calculate the final size.
         let mut buffer: Vec<u8> = vec![];
         for icon in self.icons {
@@ -58,7 +62,7 @@ struct Icon {
 
 impl Icon {
     /// Write the encoded icon to writer `w`.
-    fn write_to(self, mut wr: impl Write) -> io::Result<()> {
+    fn write_to(self, mut wr: impl Write) -> Result<(), Box<dyn std::error::Error>> {
         // Pre-buffer the png image so we can calculate size total.
         let (width, height) = (self.image.width(), self.image.height());
         let mut buffer: Vec<u8> = vec![];
@@ -66,8 +70,7 @@ impl Icon {
             self.image.into_raw().as_ref(),
             width,
             height,
-            png::ColorType::RGBA,
-            png::BitDepth::Eight,
+            image::ColorType::Rgba8,
         )?;
         // Write the 4-byte OSType identifier.
         wr.write_all(&self.kind.header().as_bytes())?;
@@ -93,15 +96,31 @@ impl<W: Write> PNGEncoder<W> {
         data: &[u8],
         width: u32,
         height: u32,
-        ct: png::ColorType,
-        bits: png::BitDepth,
-    ) -> io::Result<()> {
-        let mut encoder = png::Encoder::new(self.w, width, height);
-        encoder.set_color(ct);
-        encoder.set_depth(bits);
-        encoder.set_compression(png::Compression::Default);
-        let mut writer = encoder.write_header()?;
-        writer.write_image_data(data).map_err(|e| e.into())
+        ct: image::ColorType,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        image::png::PNGEncoder::new(self.w).encode(data, width, height, ct)?;
+        Ok(())
+    }
+}
+
+/// Create an IconSet from the provided image.
+/// If width != height, the image will be resized using the largest side
+/// without preserving the aspect ratio.
+impl From<&DynamicImage> for IconSet {
+    fn from(img: &DynamicImage) -> Self {
+        let kind = OSType::nearest(max(img.width(), img.height()));
+        let icons: Vec<Icon> = kind
+            .smaller_variants()
+            .into_par_iter()
+            .map(|v| {
+                let size = v.size();
+                Icon {
+                    kind: v,
+                    image: resize(img, size, size, Lanczos3),
+                }
+            })
+            .collect();
+        IconSet { icons }
     }
 }
 
